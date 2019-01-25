@@ -1,0 +1,351 @@
+# 双引号和单引号区别脚本:
+var=”1 2 3”
+echo $var
+1 2 3
+
+var='1 2 3'
+echo $var
+1 2 3
+
+n=3
+var="1 2 $n"
+echo $var
+1 2 3
+
+var='1 2 $n'
+echo $var
+1 2 $nvar
+
+# 字体颜色设置脚本
+for i in {31..37}; do
+     echo -e "\033[$i;40mHello world!\033[0m"
+done
+
+# 字符串比较符脚本
+a="123"
+[ -z $a ] && echo yes || echo no
+[ -z "$a" ] && echo yes || echo no
+[[ -z $a ]] && echo yes || echo no
+[ -n $a ] && echo yes || echo no
+[ -n "$a" ] && echo yes || echo no
+[[ -n $a ]] && echo yes || echo no
+[-n "$a" ] && echo yes || echo no
+
+# 整数运算脚本
+echo $((1<0))
+echo $((1>0))
+echo $((1>0?1:2))
+echo $((1<0?1:2))
+
+# 其他运算工具(let/expr/bc)
+echo "1.2<2" | bc
+echo "1.2==2" | bc
+[ $(echo "2.2 > 2" | bc) -eq 1 ] && echo yes || echo no
+
+expr length "heshixi"
+expr substr "heshixi" 2 3
+expr index "heshixi" e
+
+# 流程控制脚本
+# if单分支
+#!/bin/bash
+N=10
+if [ $N -gt 5 ]; then
+    echo yes
+fi
+
+# if双分支
+#!/bin/bash
+N=10
+if [ $N -lt 5 ]; then
+       echo yes
+else
+       echo no
+fi
+
+# if多分支
+#!/bin/bash
+N=$1
+if [ $N -eq 3 ]; then
+       echo "eq 3"
+elif [ $N -eq 5 ]; then
+        echo "eq 5"
+elif [ $N -eq 8 ]; then
+         echo "eq 8"
+else 
+           echo "no"
+fi
+
+# for语句
+#!/bin/bash
+for i in {1..5}; do
+       echo $i
+done
+# for语法也可以这么写
+# $@是将位置参数作为单个来处理
+#!/bin/bash
+for i in "$@"; {
+      echo $i
+}
+# bash test.sh 1 2 3 4 5
+
+# C语言风格语法
+#!/bin/bash
+for (( i=1; i<=5; i++)); do
+	echo $i
+done
+
+
+# while语句脚本
+# 冒号在Shell中的意思是不做任何操作。但状态是0,因此为true:
+#!/bin/bash
+while :; do
+     echo "yes"
+done
+
+# 逐行处理文本
+# cat a.txt
+a b c
+1 2 3
+x y z
+使用while循环逐行读取a.txt文件，三种方式:
+1):
+#!/bin/bash
+cat ./a.txt | while read LINE; do
+	echo $LINE
+done
+
+2):
+#!/bin/bash
+while read LINE; do
+	echo $LINE
+done < ./a.txt
+
+3):
+#!/bin/bash
+exec < ./a.txt  #读取文件作为标准输出
+while read LINE; do
+	echo $LINE
+done
+
+# break语句脚本
+示例1：在死循环中，满足条件终止循环
+#!/bin/bash
+N=0
+while true; do
+	let N++
+	if [ $N -eq 5 ]; then
+		break
+	fi
+	echo $N
+done
+# bash test1.sh
+
+示例2：continue用法
+#!/bin/bash
+N=0
+while [ $N -eq 3 ]; then
+	let N++
+	if [ $N -eq 3 ]; then
+		continue
+	fi
+	echo $N
+done
+# bash test2.sh
+
+#case语句脚本
+#!/bin/bash
+case $1 in
+	start)
+	    echo "start."
+	    ;;
+	stop)
+	    echo "stop."
+	    ;;
+	restart)
+	    echo "restart."
+	*)
+	     echo "Usage: $0 {start|stop|restart}"
+esac
+# bash test.sh
+# bash test.sh start
+# bash test.sh stop
+# linux下有一部分服务启动脚本都是这么写的。
+
+#!/bin/bash
+case $1 in
+	[0-9]{2,})
+	     echo "match number."
+	     ;;
+	[a-z])
+	     echo "match letter."
+	      ;;
+	'-h'|'--help')
+	      echo "help"
+	      ;;
+	*)
+	      echo "Input error!"
+	      exit
+esac
+# bash test.sh 1
+# bash test.sh a
+# bash test.sh -h
+
+# select语句脚本
+select mysql_version in 5.1 5.6; do
+	echo $mysql_version
+done
+
+# bash test.sh
+1) 5.1
+2) 5.6
+# 用户输入编号会直接赋值给变量mysql_version
+#? 1
+5.1
+
+# 函数脚本
+#!/bin/bash
+func() {
+    echo "This is a function."
+}
+func
+
+# bash test.sh
+
+函数返回值：
+#!/bin/bash
+func() {
+	var=$((1+1))
+	return $var	#return在函数中定义状态返回值，返回并终止函数，但返回的只能是0-255的数字，类似于exit.
+	echo "This is a function."
+}
+func
+echo $?  #上个命令的退出状态，或函数的返回值。
+
+# bash test.sh
+2
+
+函数传参：
+#!/bin/bash
+func() {
+	echo "Hello $1"	  #通过shell位置参数传参
+}
+func world
+
+# bash test.sh
+
+函数的递归调用：
+#!/bin/bash
+test() {
+	echo $1
+	sleep 1
+	test hello
+}
+test
+# 执行会一直调用本身打印hello, 这就形成了闭环。
+
+# 数组脚本
+
+示例1：将sql生成的数字序列循环放到数组里面
+#!/bin/bash
+for i in $(seq 1 10); do
+	array[a]=$i
+	let a++
+done
+echo ${array[*]}
+
+# bash test.sh
+
+示例2：遍历数组元素
+实现1:
+#!/bin/bash
+IP=(192.168.1.1 192.168.1.2 192.168.1.3)
+for ((i=0;i<${#IP[*]};i++)); do
+	echo ${IP[$i]}
+done
+
+# bash test.sh
+
+实现2：
+#!/bin/bash
+IP=(192.168.1.1 192.168.1.2 192.168.1.3)
+for IP in ${IP[*]}; do
+	echo $IP
+done
+
+# bash test.sh
+
+# 正则表达式脚本
+echo -e "1\n12\n123\n1234a" | grep '[[:digit:]]'
+
+# grep脚本
+1)输出b文件中在a文件相同的行
+grep -f a b
+2)输出b文件中在a文件不同的行
+grep -v -f a b
+3)匹配多个模式
+echo "a bc de" | xargs -n1 | grep -e 'a' -e 'bc'
+4)去除空格http.conf文件空行或开头#号的行
+grep -E -v "^$|^#" /etc/httpd/conf/httpd.conf 
+5)匹配开头不区分大小写的单词
+echo "A a b c" | xargs -n1 | grep -i a
+6)只显示匹配的字符串
+echo "this is a test" | grep -o 'is'
+7)输出匹配的前五个结果
+seq 1 20 | grep -m 5 -E '[0-9]{2}'
+8)统计匹配多少行
+seq 1 20 | grep -c -E '[0-9]{2}'
+9)匹配b字符开头的行
+echo "a bc de f" | xargs -n1 | grep '^b'
+10)匹配所有IP
+ifconfig | grep -E -o "[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}"
+11)不显示错误输出
+grep 'a' afdfsdf   #加上个-s就不显示正常输出
+
+# sed脚本
+匹配打印(p):
+1)打印匹配blp5开头的行
+tail /etc/services | sed -n '/^blp5/p'
+2)打印第一行
+tail /etc/services | sed -n '1p'
+3)打印最后一行
+tail /etc/services | sed -n '$p'
+
+匹配打印(d):
+删除与打印方法类似
+1)删除匹配blp5的行
+tail /etc/services | sed '/blp5/d'
+2)删除与第1行和三行相同的数据
+tail /etc/services | sed '1,3d'
+
+# 打印是把匹配的打印出来，删除是把匹配的删除，删除不用-n选项。
+
+替换(s///)
+1)替换blp5字符串为test(只会替换每一行中第一次匹配的字符串)，全局替换加g
+tail /etc/services | sed 's/blp5/test/'
+# tail /etc/services | sed 's/blp5/test/g'
+2)对1-4行的blp5进行替换
+tail /etc/services | sed '1,4s/blp5/test/'
+
+读取文件并追加到匹配行后(r)
+cat a.txt
+123
+456
+tail /etc/services | sed '/blp5/r a.txt'
+
+将匹配行写到文件(w)
+tail /etc/services | sed '/blp5/w a.txt'
+
+# awk脚本
+cat test.awk
+{print $2}
+
+tail -n3 /etc/services | awk -f test.awk
+
+
+资料：
+shell入门:  http://c.biancheng.net/shell/
+shell在线运行工具:  http://www.dooccn.com/shell/
+linux命令大全(中文)：http://man.linuxde.net/
+Linux Man Pages：https://www.linux.org/docs/man1/
+shell脚本中一些特殊符号：https://www.cnblogs.com/xuxm2007/archive/2011/10/20/2218846.html
